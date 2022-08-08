@@ -33,6 +33,38 @@
                  (app (cdr x) y))))) 
 
 (app nil '(x y z))
-(app nil '(x y z))
-(app nil '(x y z))#|ACL2s-ToDo-Line|#
+(app '(1 2 3) '(4 5 6 7))
+(app '(a b c d e f g) '(x y z))
+(app (app '(1 2) '(3 4)) '(5 6))
+(app '(1 2) (app '(3 4) '(5 6)))
+(let ((a '(1 2)) 
+            (b '(3 4)) 
+            (c '(5 6))) 
+        (equal (app (app a b) c) 
+               (app a (app b c))))
+
+; Free variables not given values
+;(equal (app (app a b) c) 
+;              (app a (app b c)))) 
+
+; set gag mode to see proof procedure 
+:set-gag-mode nil 
+; Theorem define
+(defthm associativity-of-app 
+  (equal (app (app a b) c) 
+         (app a (app b c))) 
+  :rule-classes nil) 
+
+; set gag mode back to default
+:set-gag-mode :goals 
+; Trivial example
+(defthm trivial-consequence
+  (equal (app (app (app (app x1 x2) (app x3 x4)) (app x5 x6)) x7)
+         (app x1 (app (app x2 x3) (app (app x4 x5) (app x6 x7))))))#|ACL2s-ToDo-Line|#
+
+
+
+
+
+
 

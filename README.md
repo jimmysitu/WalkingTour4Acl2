@@ -1,5 +1,9 @@
 # Walking Tour  for ACL2
-This repo is used as Jimmy's playground of learning ACL2
+This repo is used as Jimmy's playground of learning ACL2. It covers
+
+* [A walking tour of ACL2](https://www.cs.utexas.edu/users/moore/acl2/v8-5/combined-manual/index.html?topic=ACL2____A_02Walking_02Tour_02of_02ACL2),  about 1h
+
+* [Introduction-to-the-theorem-prover](https://www.cs.utexas.edu/users/moore/acl2/v8-5/combined-manual/index.html?topic=ACL2____INTRODUCTION-TO-THE-THEOREM-PROVER), about 40h
 
 
 
@@ -44,6 +48,16 @@ mv acl2-image-8.0-linux.x86_64 ~/.eclipse/360744286_linux_gtk_x86_64/plugins/acl
 ```
 
 Vim user may like to install Vrapper plugin for Eclipse.
+
+#### Shortcuts
+
+| Action                |     Shortcut Key     | Comment                |
+| --------------------- | :------------------: | ---------------------- |
+| Advance Todo          |   Shift + Ctrl + I   | Move on one command    |
+| Move line past Cursor | Shift + Ctrl + Enter | Move to current cursor |
+| Retreat line          |   Shift + Ctrl + M   | Undo last command      |
+
+
 
 ### Emacs Approach
 
