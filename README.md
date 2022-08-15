@@ -13,6 +13,12 @@ This repo is used as Jimmy's playground of learning **ACL2**. It covers
 
 ### Eclipse Approach
 
+#### Out of Box Install
+
+Download the zip [here](http://acl2s.ccs.neu.edu/acl2s/doc/download.html), and unpack and go...
+
+#### More Complicate Way
+
 Install acl2s with Eclipse, following instruction [here](http://acl2s.ccs.neu.edu/acl2s/doc/installation.html#install-old)
 
 For Ubuntu, install *default-jre* and *Eclipse*
