@@ -1,11 +1,13 @@
-# Walking Tour  for ACL2
-This repo is used as Jimmy's playground of learning ACL2. It covers
+# Jimmy's Playground of  Learning ACL2
+This repo is used as Jimmy's playground of learning **ACL2**. It covers
 
 * [A walking tour of ACL2](https://www.cs.utexas.edu/users/moore/acl2/v8-5/combined-manual/index.html?topic=ACL2____A_02Walking_02Tour_02of_02ACL2),  about 1h
 
 * [Introduction-to-the-theorem-prover](https://www.cs.utexas.edu/users/moore/acl2/v8-5/combined-manual/index.html?topic=ACL2____INTRODUCTION-TO-THE-THEOREM-PROVER), about 40h
 
+* [Computer-Aided Reasoning: An Approach](https://www.cs.utexas.edu/users/moore/publications/acl2-books/car/index.html)
 
+  
 
 ## Setup Environment
 
@@ -20,7 +22,7 @@ sudo apt install default-jre
 sudo snap install eclipse --classic
 ```
 
-Install ACL2s with the Eclipse Updater
+https://www.cs.utexas.edu/users/moore/publications/acl2-books/car/index.htmlInstall ACL2s with the Eclipse Updater
 
 * Help | Install New Software..
 
@@ -68,4 +70,18 @@ sudo apt install acl2
 ```
 
 ## Walking Tour
+
+Follow the tour instruction. `walkingTour.lisp` is includes the code of `app` example in the tour.
+
+## Introduction to the Theorem Prover
+
+Most code in the tutorial is intended to run, so there is no `.lisp` relative to this tour.
+
+## Computer-Aide Reasoning: An Approach (CAR)
+
+Exercise solution is [here](https://github.com/acl2/acl2/tree/master/books/textbook)
+
+## Computer-Aide Reasoning: ACL2 Case Studies (ACS)
+
+
 
