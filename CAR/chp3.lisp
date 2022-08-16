@@ -42,17 +42,65 @@
       (incrmt (+ x 1))
       (double (* x 2))
       (otherwise 0))
-#|ACL2s-ToDo-Line|#
 
 ;;; Exercise 3.8
+;(let ((x 3)
+;      (y x))
+;  (+ x y))
+;)
+;
+;:trans1 (let* ((x 1)
+;              (y x))
+;         (+ x y))
+
+;;; Execrise 3.9
+;1. twice the sum of x and y
 (let ((x 3)
-      (y x))
-  (+ x y))
-)
+      (y 4))
+  (* 2 (+ x y)))
+; test one more
+(let ((x 6)
+      (y 4))
+  (* 2 (+ x y)))
 
-:trans1 (let* ((x 1)
-              (y x))
-         (+ x y))
+;2. the car of the cdr of x
+(let ((x '(1 2 3)))
+  (car (cdr x)))
+; test another one list
+(let ((x '(1 '(2 3))))
+  (car (cdr x)))
+; try to understand what happen here
+(let ((x '(1 '(2 3))))
+  (cdr x))
+; try others
+(let ((x '(1 2 (3 4))))
+  (car (cdr x)))
+
+;3. x is y
+(let ((x 1) (y 1))
+  (equal x y))
+
+(let ((x 1) (y 2))
+  (equal x y))
+
+;4. x is a non-integer rational number
+(let ((x 1))
+  (and (not (integerp x)) (rationalp x)))
+
+(let ((x 1/2))
+  (and (not (integerp x)) (rationalp x)))
+
+;5. x is a symbol in the package SMITH
+(let ((x 1))
+  (and (symbolp x) (equal (symbol-package-name x) "SMITH")))
+
+;6. 0, if x is a string; 1, otherwise
+(let ((x "I am a string"))
+  (if (stringp x) 0 1))
+  
+(let ((x 1))
+  (if (stringp x) 0 1))#|ACL2s-ToDo-Line|#
 
 
-      
+
+
