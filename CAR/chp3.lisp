@@ -42,17 +42,31 @@
       (incrmt (+ x 1))
       (double (* x 2))
       (otherwise 0))
-#|ACL2s-ToDo-Line|#
 
 ;;; Exercise 3.8
-(let ((x 3)
-      (y x))
-  (+ x y))
-)
+(let ((x 3))
+  (let ((x 1)
+        (y x))
+    (+ x y)))
+;[JM] From exe 3.6, the lambda is actully doing 1+X. For 3.8, X=3, so the return should be 4
 
+; Replace let with let*, check the expansion
 :trans1 (let* ((x 1)
               (y x))
          (+ x y))
 
+:trans (let* ((x 1)
+             (y x))
+        (+ x y))
+;[JM] It is actually doing X+X
+(let* ((x 1)
+       (y x))
+  (+ x y))#|ACL2s-ToDo-Line|#
 
-      
+;[JM] With X=1, which should return 2
+
+(let ((x 3))
+  (declare (ignore x))
+  (let* ((x 1)  ; x is 1
+         (y x)) ; y is 1
+    (+ x y)))
