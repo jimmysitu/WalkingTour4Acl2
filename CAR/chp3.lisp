@@ -88,7 +88,8 @@
   (and (not (integerp x)) (rationalp x)))
 
 (let ((x 1/2))
-  (and (not (integerp x)) (rationalp x)))
+  (and (not (integerp x)) (rationalp x)))#|ACL2s-ToDo-Line|#
+
 
 ;5. x is a symbol in the package SMITH
 (let ((x 1))
@@ -99,8 +100,42 @@
   (if (stringp x) 0 1))
   
 (let ((x 1))
-  (if (stringp x) 0 1))#|ACL2s-ToDo-Line|#
+  (if (stringp x) 0 1))
+
+;;; Execrise 3.10
+(defun fib (n)
+  (if (or (zp n) (equal n 1))
+    1 
+    (+ (fib (- n 2)) 
+       (fib (- n 1)))))
+  
+; Test fib
+(fib 0)
+(fib 1)
+(fib 2)
+(fib 3)
+(fib 4)
+(fib 5)
+;(fib '(1 2 3))
 
 
+;;; Execrise 3.11
+(defun pascal (i j)
+  (if (or (zp i) (zp j) (equal i j))
+    1
+    (+ (pascal (- i 1) (- j 1))
+       (pascal (- i 1) j))))
+
+; Test pascal
+(pascal 0 0)
+(pascal 1 0)
+(pascal 2 0)
+(pascal 8 0)
+(pascal 2 1)
+(pascal 3 1)
+(pascal 3 2)
+(pascal 5 3)
+(pascal 5 4)
+(pascal 6 2)
 
 
