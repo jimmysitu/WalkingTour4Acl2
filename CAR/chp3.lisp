@@ -1,32 +1,3 @@
-; ****************** BEGIN INITIALIZATION FOR ACL2s MODE ****************** ;
-; (Nothing to see here!  Your actual file is after this initialization code);
-
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading the CCG book.~%") (value :invisible))
-(include-book "acl2s/ccg/ccg" :uncertified-okp nil :dir :system :ttags ((:ccg)) :load-compiled-file nil);v4.0 change
-
-;Common base theory for all modes.
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading ACL2s base theory book.~%") (value :invisible))
-(include-book "acl2s/base-theory" :dir :system :ttags :all)
-
-
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading ACL2s customizations book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
-(include-book "custom" :dir :acl2s-modes :ttags :all)
-
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem setting up ACL2s mode.") (value :invisible))
-
-;Settings common to all ACL2s modes
-(acl2s-common-settings)
-;(acl2::xdoc acl2s::defunc) ;; 3 seconds is too much time to spare -- commenting out [2015-02-01 Sun]
-
-(acl2::xdoc acl2s::defunc) ; almost 3 seconds
-
-; Non-events:
-;(set-guard-checking :none)
-
-(acl2::in-package "ACL2S")
-
-; ******************* END INITIALIZATION FOR ACL2s MODE ******************* ;
-;$ACL2s-SMode$;ACL2s
 ; Chp3
 ;;; Exercise 3.6
 :trans (cond ((equal op 'incrmt) (+ x 1))
@@ -44,14 +15,31 @@
       (otherwise 0))
 
 ;;; Exercise 3.8
-;(let ((x 3)
-;      (y x))
-;  (+ x y))
-;)
-;
-;:trans1 (let* ((x 1)
-;              (y x))
-;         (+ x y))
+(let ((x 3))
+  (let ((x 1)
+        (y x))
+    (+ x y)))
+;[JM] From exe 3.6, the lambda is actully doing 1+X. For 3.8, X=3, so the return should be 4
+
+; Replace let with let*, check the expansion
+:trans1 (let* ((x 1)
+              (y x))
+         (+ x y))
+
+:trans (let* ((x 1)
+             (y x))
+        (+ x y))
+;[JM] It is actually doing X+X
+(let* ((x 1)
+       (y x))
+  (+ x y))
+;[JM] With X=1, which should return 2
+
+(let ((x 3))
+  (declare (ignore x))
+  (let* ((x 1)  ; x is 1
+         (y x)) ; y is 1
+    (+ x y)))
 
 ;;; Execrise 3.9
 ;1. twice the sum of x and y
@@ -138,4 +126,79 @@
 (pascal 5 4)
 (pascal 6 2)
 
+
+;;; Exercise 3.12
+; helper
+(defun mem (e x)
+  (if (endp x)
+    nil
+    (if (equal e (car x))
+      t
+      (mem e (cdr x)))))
+
+(defun subset (x y)
+  (if (endp x)
+    t
+    (if (mem (car x) y)
+      (subset (cdr x) y)
+      nil)))
+; Test subset
+(subset '(1 2 3) '(3 4 2 9 7 1))
+(subset '(1 2 0) '(3 4 2 9 7 1))
+
+;;; Exercise 3.13
+(defun un (x y)
+  (cond ((endp x) y) 
+        ((mem (car x) y)  (un (cdr x) y))
+        (t (cons (car x) (un (cdr x) y)))))
+; Test un
+(un '(1 2 3) '(4 5 6))
+(un '(1 2 3) '(1 2 3))
+(un '(1 2 0) '(1 2 3))
+(un '(1 2 0) '(1 2 2 3 4))
+(un '(1 2 0 0 0 6 3) '(1 2 2 3 4))
+
+;;; Exercise 3.14
+(defun int (x y)
+  (cond ((endp x) nil)
+        ((mem (car x) y) (cons (car x) (int (cdr x) y)))
+        (t (int (cdr x) y))))
+; Test int
+(int '(1 2 3) '(4 5 6))
+(int '(1 2 3) '(1 5 6))
+(int '(1 2 3) '(2 5 6 1 3))
+(int '(1 2 3 6 7) '(1 3))
+
+;;; Exercise 3.15
+(defun diff (x y)
+  (cond ((endp x) nil)
+        ((mem (car x) y) (diff (cdr x) y))
+        (t (cons (car x) (diff (cdr x) y)))))
+; Test diff
+(diff '(1 2 3) '(4 5 6))
+(diff '(1 2 3) '(2 1 6))
+
+;;; Exercise 3.16
+(defun rev__ (x)
+  (if (endp x)
+    nil
+    (append (rev__ (cdr x)) (list (car x)))))
+; Test rev
+(rev__ '(a b c d))
+(rev__ '(a b c d e f g))
+
+;;; Exercise 3.17
+; helper
+(defun insert (n x)
+  (cond ((endp x) (list n))
+        ((< n (car x)) (cons n x))
+        (t (cons (car x) (insert n (cdr x))))))
+
+(defun isort (x)
+  (if (endp x)
+    nil
+    (insert (car x) (isort (cdr x)))))
+; Test isort
+(isort '(3 2 0 1 4))
+(isort '(3 2 0 1 8 9 11 4))#|ACL2s-ToDo-Line|#
 

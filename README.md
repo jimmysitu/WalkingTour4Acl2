@@ -85,7 +85,7 @@ Most code in the tutorial is intended to run, so there is no `.lisp` relative to
 
 ## Computer-Aide Reasoning: An Approach (CAR)
 
-Exercise solution is [here](https://github.com/acl2/acl2/tree/master/books/textbook)
+Solutions to exercises are [here](https://github.com/acl2/acl2/tree/master/books/textbook)
 
 ## Computer-Aide Reasoning: ACL2 Case Studies (ACS)
 
