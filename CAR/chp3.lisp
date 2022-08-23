@@ -76,8 +76,7 @@
   (and (not (integerp x)) (rationalp x)))
 
 (let ((x 1/2))
-  (and (not (integerp x)) (rationalp x)))#|ACL2s-ToDo-Line|#
-
+  (and (not (integerp x)) (rationalp x)))
 
 ;5. x is a symbol in the package SMITH
 (let ((x 1))
@@ -200,5 +199,59 @@
     (insert (car x) (isort (cdr x)))))
 ; Test isort
 (isort '(3 2 0 1 4))
-(isort '(3 2 0 1 8 9 11 4))#|ACL2s-ToDo-Line|#
+(isort '(3 2 0 1 8 9 11 4))
+
+;;; Exercise 3.18
+(defun flatten (x)
+  (if (atom x)
+    (list x)
+    (append (flatten (car x))
+          (flatten (cdr x)))))
+; Test flatten
+(flatten '((a . b) . c))
+
+;;; Exercise 3.19
+(defun swap-tree (x)
+  (if (atom x)
+    x
+    (cons (swap-tree (cdr x))
+          (swap-tree (car x)))))
+; Test swap-tree
+(swap-tree '((a . b) . c))
+(swap-tree '((a . b) . (c . d)))
+
+;;; Exercise 3.20
+(defun depth (x)
+  (if (atom x)
+    0
+    (cond ((< (depth (car x)) (depth (cdr x))) (+ 1 (depth (cdr x))))
+          (t (+ 1 (depth (car x)))))))
+; Test depth
+(depth '((a . b) . c))
+(depth '((a . (b . d)) . c))
+
+;;; Exercise 3.21
+(defun subtree (p x)
+  (cond ((endp p) x)
+        ((equal (car p) 'a) (subtree (cdr p) (car x)))
+        (t (subtree (cdr p) (cdr x)))))
+; Test subtree
+(subtree '(a d d) '((1 . (2 . 2)) . 3))
+(subtree '(a d a) '((1 . (2 . 2)) . 3))
+(subtree '(a a) '((1 . (2 . 2)) . 3))
+(subtree '(d) '((1 . (2 . 2)) . 3))
+(subtree '(a d) '((1 . (2 . 2)) . 3))
+
+;;; Exercise 3.22
+(defun replace-subtree (p new x)
+  (cond ((endp p) new)
+        ((equal (car p) 'a) 
+           (cons (replace-subtree (cdr p) new (car x)) (cdr x)))
+        (t 
+           (cons (car x) (replace-subtree (cdr p) new (cdr x))))))
+; Test replace-subtree
+(replace-subtree '(a d d) '(4 . 5) '((1 . (2 . 2)) . 3))
+(replace-subtree '(a a) '(4 . (5 . 6)) '((1 . (2 . 2)) . 3))#|ACL2s-ToDo-Line|#
+
+
 
