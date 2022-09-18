@@ -299,8 +299,7 @@
 (acl2-value '(= 22 (+ x (* y 3))) '((x . 1) (y . 7)))
 (acl2-value '(= 22 (+ x (* y 3))) '((x . 3) (y . 7)))
 
-(program)#|ACL2s-ToDo-Line|#
-
+(program)
 ;;; Exercise 4.19
 ; Solution from github
 (defun next-k-ar (k ar bound)
@@ -418,7 +417,8 @@
 (time$ (next-k-max-iterations 50000)) ; basic
 (time$ (next-k-max-iterations1 50000)) ; tail recursive
 (time$ (next-k-max-iterations-ar 50000)) ; arrays
-(time$ (next-k-max-iterations-stobj 50000 st)) ; stobj
+(time$ (next-k-max-iterations-stobj 50000 st))#|ACL2s-ToDo-Line|#
+ ; stobj
 
          
          

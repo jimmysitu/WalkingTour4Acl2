@@ -184,7 +184,8 @@
     (append (rev__ (cdr x)) (list (car x)))))
 ; Test rev
 (rev__ '(a b c d))
-(rev__ '(a b c d e f g))
+(rev__ '(a b c d e f g))#|ACL2s-ToDo-Line|#
+
 
 ;;; Exercise 3.17
 ; helper
@@ -251,7 +252,6 @@
            (cons (car x) (replace-subtree (cdr p) new (cdr x))))))
 ; Test replace-subtree
 (replace-subtree '(a d d) '(4 . 5) '((1 . (2 . 2)) . 3))
-(replace-subtree '(a a) '(4 . (5 . 6)) '((1 . (2 . 2)) . 3))#|ACL2s-ToDo-Line|#
-
+(replace-subtree '(a a) '(4 . (5 . 6)) '((1 . (2 . 2)) . 3))
 
 
