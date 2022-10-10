@@ -34,8 +34,7 @@
   (equal (consp (rev x))
          (consp x)))
 
-(verify)#|ACL2s-ToDo-Line|#
-
+(verify)
 
 (defthm main-9-4
   (equal (rev x)
@@ -46,5 +45,6 @@
              (cons (car (rev (cdr x)))
                    (rev (cons (car x)
                               (rev (cdr (rev (cdr x))))))))))
-  :rule-classes nil)
+  :rule-classes nil)#|ACL2s-ToDo-Line|#
+
 
