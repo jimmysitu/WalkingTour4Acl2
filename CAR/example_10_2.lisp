@@ -38,10 +38,42 @@
   :hints (("Goal"
            :in-theory (disable associativity-of-ac-fun)
            :use ((:instance associativity-of-ac-fun)
-                 (:instance associativity-of-ac-fun (x y) (y x))))))#|ACL2s-ToDo-Line|#
+                 (:instance associativity-of-ac-fun (x y) (y x))))))
+
+(defthm commutativity-2-of-* 
+  (equal (* y (* x z))
+         (* x (* y z)))
+  :hints (("Goal" 
+           :by (:functional-instance
+                commutativity-2-of-ac-fun 
+                (ac-fun (lambda (x y) (* x y)))))))
+
+; Define a function to make it conveniet to create symbols
+(defun make-name (prefix name)
+  (intern-in-package-of-symbol
+   (concatenate 'string
+                (symbol-name prefix)
+                "-"
+                (symbol-name name))
+   prefix))
+
+; Define macro
+(defmacro commutativity-2 (op)
+  `(defthm ,(make-name 'commutativity-2-of op)
+     (equal (,op y (,op x z))
+            (,op x (,op y z)))
+     :hints (("Goal"
+              :by (:functional-instance
+                   commutativity-2-of-ac-fun
+                   (ac-fun (lambda (x y) (,op x y))))))))
+
+; Define theorm of commutativity of multiplier
+(commutativity-2 *)#|ACL2s-ToDo-Line|#
 
 
-
-
+                            
+                            
+                            
+                            
 
          
