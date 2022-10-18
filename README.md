@@ -32,7 +32,7 @@ https://www.cs.utexas.edu/users/moore/publications/acl2-books/car/index.htmlInst
 
 * Help | Install New Software..
 
-* Click the "Add..." button near top right and enter Name: ACL2 Sedan and enter Location:
+* Click the "Add..." button near top right and enter Name: `ACL2 Sedan` and enter Location:
 
   >  http://acl2s.ccs.neu.edu/acl2s/update
 
@@ -46,13 +46,13 @@ https://www.cs.utexas.edu/users/moore/publications/acl2-books/car/index.htmlInst
 
 * Restart Eclipse as recommended.
 
-However, installing ACL2 Image from update site, changes the date of book files.  It may cause certify book fail. Download the tar.gz file form website and override it.
+However, installing ACL2 Image from update site, changes the date of book files.  It may cause certify book fail. Download the tar.gz file form website and override it. Be careful, do not change the date of book files here, usually  `mv` command is enough.
 
 ```bash
 wget http://acl2s.ccs.neu.edu/acl2s/src/acl2/acl2-image-8.0-linux.x86_64.tar.gz
 tar -zxf acl2-image-8.0-linux.x86_64.tar.gz
-rm -rf ~/.eclipse/360744286_linux_gtk_x86_64/plugins/acl2_image.linux.x86_64_8.0.0 
-mv acl2-image-8.0-linux.x86_64 ~/.eclipse/360744286_linux_gtk_x86_64/plugins/acl2_image.linux.x86_64_8.0.0
+rm -rf $ECLIPSE_PLUGINS_PATH/plugins/acl2_image.linux.x86_64_8.0.0 
+mv acl2-image-8.0-linux.x86_64 $ECLIPSE_PLUGINS_PATH/plugins/acl2_image.linux.x86_64_8.0.0
 ```
 
 Vim user may like to install Vrapper plugin for Eclipse.
