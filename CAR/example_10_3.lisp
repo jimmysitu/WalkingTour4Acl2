@@ -38,9 +38,12 @@
 
 ; Check insertion-sort is a permutation of its input
 (defthm insertion-sort-is-perm
-  (perm (insertion-sort x) x))#|ACL2s-ToDo-Line|#
+  (perm (insertion-sort x) x))
 
 
+(defthm insert-perm-cons
+  (implies (perm x y)
+           (perm (insert a x) (cons a y))))#|ACL2s-ToDo-Line|#
 
 
 
