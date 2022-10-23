@@ -49,8 +49,7 @@
               (eval (caddr exp) alist)))
           (t ; *
            (* (eval (car exp) alist)
-              (eval (caddr exp) alist)))))))#|ACL2s-ToDo-Line|#
-
+              (eval (caddr exp) alist)))))))
 
 ; Stack machine
 ; Basic operation
@@ -59,6 +58,10 @@
 (defun push (val stk) (cons val stk))
 
 ; Single step for machine
+; @ins: the instruction
+; @alist: a mapping list, var and its value
+; @stk: machine stack
+; return: stk
 (defun step (ins alist stk)
   (let ((op (car ins)))
     (case op
@@ -73,6 +76,10 @@
 
 
 ; Run a program
+; @program: list of instructions
+; @alist: var and its value, the input of a program
+; @stk: machine stack
+; return: stk
 (defun run (program alist stk)
   (cond ((endp program) stk) 
         ((run (cdr program)
@@ -80,4 +87,69 @@
               (step (car program) alist stk)))))
 
 
-; Compiler
+; Compiler, from exp to program
+(defun compile (exp)
+  (cond
+   ((atom exp) (cond ((symbolp exp)
+                      (list (list 'pushv exp)))
+                     (t (list (list 'pushc exp)))))
+   ((equal (len exp) 2)
+    (cond ((equal (car exp) 'inc)
+           (append (compile (cadr exp)) '((pushc 1) (add))))
+          (t (append (compile (cadr exp)) '((dup) (mul))))))
+   (t (cond ((equal (cadr exp) '+)
+             (append (compile (car exp))
+                     (compile (caddr exp))
+                     '((add))))
+            (t (append (compile (car exp))
+                       (compile (caddr exp))
+                       '( (mul))))))))
+
+; Proof helpers
+(defthm composition
+  (equal (run (append prg1 prg2) alist stk)
+         (run prg2 alist (run prg1 alist stk))))
+
+
+; Proof helper of general form
+; Tell ACL2 how to induction a comile function
+(defun compiler-induct (exp alist stk)
+  (cond 
+   ((atom exp) stk)
+   ((equal (len exp) 2)
+    (compiler-induct (cadr exp) alist stk))
+   (t ; Any binary function may be used in place of append below
+    (append (compiler-induct (car exp) alist stk)
+            (compiler-induct (caddr exp)
+                             alist
+                             (cons (eval (car exp) alist)
+                                   stk))))))
+
+; Genernal form of compiler is correct
+; Assert: The stack after running a program is equal the eval of exp append with original stack
+; Explain: A program result is pushed into top of stack, and never changes elements below
+(defthm compile-is-correct-general
+  (implies (exprp exp)
+           (equal (run (compile exp) alist stk)
+                  (cons (eval exp alist) stk)))
+  :hints (("Goal"
+           :induct (compiler-induct exp alist stk))))
+
+; Prove that compiler is correct
+; Assert: The top of stack after running a program is equal the eval of exp
+(defthm compile-is-correct
+  (implies (exprp exp)
+           (equal (top (run (compile exp) alist stk))
+                  (eval exp alist))))#|ACL2s-ToDo-Line|#
+
+
+
+
+
+   
+   
+   
+   
+   
+   
+   
