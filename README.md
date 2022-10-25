@@ -46,7 +46,7 @@ https://www.cs.utexas.edu/users/moore/publications/acl2-books/car/index.htmlInst
 
 * Restart Eclipse as recommended.
 
-However, installing ACL2 Image from update site, changes the date of book files.  It may cause certify book fail. Download the tar.gz file form website and override it. Be careful, do not change the date of book files here, usually  `mv` command is enough.
+However, installing ACL2 Image from update site, changes the date of book files.  It may cause certify book fail. Download the tar.gz file form website and override it. Be careful, do not change the date of book files here, usually  `mv` or `cp -p`command is enough.
 
 ```bash
 wget http://acl2s.ccs.neu.edu/acl2s/src/acl2/acl2-image-8.0-linux.x86_64.tar.gz
