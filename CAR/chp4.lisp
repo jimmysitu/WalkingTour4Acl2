@@ -208,6 +208,9 @@
 ; Test splist-list
 (split-list '(3 6 2 9 2 8 3/2))
 (split-list '(3 6 2 9 2 8 7 3/2))
+(split-list '(1))
+(split-list '(1 2))
+
 (mv-let (odds events)
         (split-list '(3 6 2 9 2 8 7 3/2))
         (append odds events))
@@ -235,6 +238,11 @@
                    (merge2 (mergesort odds) (mergesort evens))))))
 ; Test mergesort
 (mergesort '(3 6 2 9 2 8 7 3/2))
+(mergesort '(3))
+(mergesort '(3 2))#|ACL2s-ToDo-Line|#
+
+(mergesort '())
+
 
 ;;; Exercise 4.16
 ; Some test
@@ -417,8 +425,7 @@
 (time$ (next-k-max-iterations 50000)) ; basic
 (time$ (next-k-max-iterations1 50000)) ; tail recursive
 (time$ (next-k-max-iterations-ar 50000)) ; arrays
-(time$ (next-k-max-iterations-stobj 50000 st))#|ACL2s-ToDo-Line|#
- ; stobj
+(time$ (next-k-max-iterations-stobj 50000 st)) ; stobj
 
          
          

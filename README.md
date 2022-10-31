@@ -87,6 +87,14 @@ Most code in the tutorial is intended to run, so there is no `.lisp` relative to
 
 Solutions to exercises are [here](https://github.com/acl2/acl2/tree/master/books/textbook)
 
+### Tips
+
+* When the proof of theorem stop at a subgoal, try to understand what is this subgoal want to assert.
+  * One common case is that subgoal needs too much propositions which it is not necessary. Try to proof a theorem stronger theorem with less proposition
+  * Some cases, one proposition can be implied by other propositions
+  *  Other common case is that subgoal is a false proposition, which can never be proof. In such case, there are usually contradiction in propositions. Try to write out a theorem to assert this contradiction
+* When the proof of theorem cannot be stopped in a while, usually more than several minutes, the proof maybe come into a dead loop.
+
 ## Computer-Aide Reasoning: ACL2 Case Studies (ACS)
 
 
