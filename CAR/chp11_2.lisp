@@ -477,35 +477,120 @@
 ;         (PERM (APPEND X (CDR Y))
 ;               (DEL (CAR Y) (APPEND X Y))))
 ;
+; Proof helper of merge2-append
 ; [JM] From *1/4.2, try car-in-append
 (defthm car-in-append
-  (implies (and (consp y))
+  (implies (consp y)
            (in (car y) (append x y))))
 
-(defthm del-append
-  (equal (del a (append x y))
-         (if (in a x)
-             (append (del a x) y)
-           (append x (del a y)))))#|ACL2s-ToDo-Line|#
-
-
-; [JM] From *1/4.1, try perm-append-del
-(defthm perm-append-del
+; [JM] From *1/4.1, try first version of perm-append-del
+;(defthm perm-append-del-v1
+;  (implies (and (consp x)
+;                (consp y)
+;                (perm (merge2 x (cdr y))
+;                      (append x (cdr y))))
+;           (perm (append x (cdr y))
+;                 (del (car y) (append x y)))))
+;
+; [JM] It seems *v1 will never be true if (in a x), from prover
+;Subgoal *1/2.1
+;(IMPLIES (AND (CONSP X)
+;              (NOT (PERM (MERGE2 (CDR X) (CDR Y))
+;                         (APPEND (CDR X) (CDR Y))))
+;              (CONSP Y)
+;              (PERM (MERGE2 X (CDR Y))
+;                    (CONS (CAR X) (APPEND (CDR X) (CDR Y))))
+;              (NOT (EQUAL (CAR Y) (CAR X))))
+;         (PERM (MERGE2 X (CDR Y))
+;               (CONS (CAR X)
+;                     (DEL (CAR Y) (APPEND (CDR X) Y)))))
+;
+; [JM] Try to add (not (in (car y) x)) in the theorem                        
+;(defthm perm-append-del-v2
+;  (implies (and (consp x)
+;                (consp y)
+;                (not (in (car y) x)))
+;           (perm (append x (cdr y))
+;                 (del (car y) (append x y)))))
+;
+; [JM] *v2 is admited, but it do not help to proof merge2-append,
+;      the prover do not know how to use it.
+;
+; [JM] Look back *1/4.1, try a stronger version
+;Subgoal *1/2.4'
+;(IMPLIES (AND (CONSP X)
+;              (PERM (APPEND (CDR X) (CDR Y))
+;                    (DEL (CAR X) (APPEND (CDR X) Y)))
+;              (CONSP Y)
+;              (EQUAL (CAR Y) (CAR X)))
+;         (IN (CAR X) (APPEND (CDR X) Y)))
+;
+; [JM] Try equal-in-append
+(defthm equal-in-append
   (implies (and (consp x)
                 (consp y)
+                (equal (car y) (car x)))
+           (in (car x) (append (cdr x) y))))
+                
+                       
+(defthm perm-append-del
+  (implies (and (consp x)
+                (consp y))
            (perm (append x (cdr y))
                  (del (car y) (append x y)))))
-                         
-:brr t
-; Proof helper of merge2-append
+
+           
 (defthm merge2-append
   (perm (merge2 x y)
         (append x y))
   :hints (("Goal" :induct (merge2 x y))))
 
+;Subgoal *1/3'''
+;(IMPLIES (AND (CONSP LST)
+;              (CONSP (CDR LST))
+;              (PERM (MERGESORT (CONS (CAR LST)
+;                                     (MV-NTH 1 (SPLIT-LIST (CDR LST)))))
+;                    (CONS (CAR LST)
+;                          (MV-NTH 1 (SPLIT-LIST (CDR LST)))))
+;              (PERM (MERGESORT (CAR (SPLIT-LIST (CDR LST))))
+;                    (CAR (SPLIT-LIST (CDR LST)))))
+;         (PERM (APPEND (MV-NTH 1 (SPLIT-LIST (CDR LST)))
+;                       (CAR (SPLIT-LIST (CDR LST))))
+;               (CDR LST)))
+;
+; [JM] Subgoal pass merge2, and move on, try perm-append-split and got
+;Subgoal *1/3''
+;(IMPLIES (AND (CONSP LST)
+;              (PERM (APPEND (CAR (SPLIT-LIST (CDR LST)))
+;                            (MV-NTH 1 (SPLIT-LIST (CDR LST))))
+;                    (CDR LST)))
+;         (PERM (APPEND (MV-NTH 1 (SPLIT-LIST (CDR LST)))
+;                       (CAR (SPLIT-LIST (CDR LST))))
+;               (CDR LST)))
+; [JM] It seems a dead loop proof, 
+;      and need to proof a theorem that append keeps perm property 
+(defthm perm-append
+  (perm (append x y)
+        (append y x)))
+
+(defthm perm-append-split
+  (implies (consp lst)
+           (perm (append (mv-nth 1 (split-list lst))
+                         (car (split-list lst)))
+                 lst)))
+ 
+(defthm perm-append-split-rev
+  (implies (consp lst)
+           (perm (append (car (split-list lst))
+                         (mv-nth 1 (split-list lst)))
+                 lst)))
+
+
+
 ; Proof target
 (defthm perm-mergesort
-  (perm (mergesort lst) lst))
+  (perm (mergesort lst) lst))#|ACL2s-ToDo-Line|#
+
 
 
 
