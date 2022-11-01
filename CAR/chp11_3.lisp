@@ -39,7 +39,7 @@
 ;                  (APPEND (COMPRESS (CDR X)) Y))))
 ;
 ;[JM] It seems it needs not-in-append-compress
-(defthm not-in-compress
+(defthm not-in-append-compress
   (implies (and (not (in a x))
                 (not (in a (append x y))))
            (not (in a (append (compress x) y)))))
@@ -76,12 +76,15 @@
       t
       (mem e (cdr x)))))
 
+; [JM] mem is similar with in, try to replace it
 (defun no-dupls-p (lst)
   (cond ((atom lst) t)
-        ((mem (car lst) (cdr lst)) nil)
-        (t (no-dupls-p (cdr lst)))))#|ACL2s-ToDo-Line|#
-
-
+        ((in (car lst) (cdr lst)) nil)
+        (t (no-dupls-p (cdr lst)))))
+; Test no-dupls-p
+(no-dupls-p '(a b c a d))
+(no-dupls-p '(a b c d))
+            
 ; Proof helper for compress-orderedp
 ;Subgoal *1/5.1
 ;(IMPLIES (AND (CONSP X)
@@ -89,13 +92,19 @@
 ;              (NO-DUPLS-P (COMPRESS (CDR X)))
 ;              (<= (CAR X) (CADR X))
 ;              (ORDEREDP (CDR X)))
-;         (NOT (MEM (CAR X) (COMPRESS (CDR X)))))
+;         (NOT (IN (CAR X) (COMPRESS (CDR X)))))
+;
+; [JM] It seems it need not-in-compress
+(defthm not-in-compress
+  (implies (not (in a x))
+           (not (in a (compress x)))))
 
 
 ; Proof target
 (defthm compress-ordered
   (implies (orderedp x)
-           (no-dupls-p (compress x))))
+           (no-dupls-p (compress x))))#|ACL2s-ToDo-Line|#
+
 
 
 
