@@ -585,8 +585,6 @@
                          (mv-nth 1 (split-list lst)))
                  lst)))
 
-
-
 ; Proof target
 (defthm perm-mergesort
   (perm (mergesort lst) lst))#|ACL2s-ToDo-Line|#

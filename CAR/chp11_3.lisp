@@ -5,34 +5,61 @@
         (t (in a (cdr b)))))
 
 ; [JM] My compress define
-(defun compress (x)
+(defun compress-jm (x)
   (cond ((endp x) nil)
-        ((equal (car x) (cadr x)) (compress (cdr x)))
-        (t (cons (car x) (compress (cdr x))))))
+        ((equal (car x) (cadr x)) (compress-jm (cdr x)))
+        (t (cons (car x) (compress-jm (cdr x))))))
 
 ; [JM] Define from solution
 (defun compress-s (x)
   (cond ((or (endp x) (endp (cdr x))) x)
-        ((equal (car x) (cadr x)) (compress (cdr x)))
-        (t (cons (car x) (compress (cdr x))))))
-
-; Try to fine the difference
-;(defthm compress-equiv
-;  (equal (compress x) (compress-s x)))
+        ((equal (car x) (cadr x)) (compress-s (cdr x)))
+        (t (cons (car x) (compress-s (cdr x))))))
 
 ; Test compress
-(compress '(x x x y z y x y y))
-; It should be '(x y z y x y)
-(compress '(x x x y z z z y x y y))
-; It should be '(x y z y x y)
+(compress-jm '(x x x y z y x y y))
+(compress-jm '(x x x y z z z y x y y))
+(compress-jm '())
+(compress-jm '(x))
+(compress-jm '(x x))
+(compress-jm '(nil x))
+(compress-s  '(nil x))
+(compress-jm '(nil nil))
+(compress-s  '(nil nil))
+; [JM] Try to find the difference with theorem compress-equiv, and get
+;(defthm compress-equiv
+;  (equal (compress-jm x) (compress-s x)))
+;Subgoal *1/2.2''
+;(IMPLIES (AND (CONSP X) (NOT (CAR X)))
+;         (CDR X))
+(and (consp '(nil)) (not (car '(nil)))); return T
+(cdr '(nil)); return NIL
+; [JM] Maybe compress is not equal to compress-s with '(nil)
+(compress-jm '(nil))
+(compress-s '(nil))
+(endp '(nil)) ; return NIL
+(equal (car '(nil)) (cadr '(nil))) ; returns T, here is the problem
+
+; [JM] Try a new version
+(defun compress (x)
+  (cond ((endp x) nil)
+        ((endp (cdr x)) x)
+        ((equal (car x) (cadr x)) (compress (cdr x)))
+        (t (cons (car x) (compress (cdr x))))))
+;Test compress
+(compress '(nil))
 (compress '())
-(compress '(x))
-(compress '(x x))
-(compress '(nil x x))
-(compress-s '(nil x x))
-(cadr '())#|ACL2s-ToDo-Line|#
+(compress-s '(nil))
+(compress-s'())#|ACL2s-ToDo-Line|#
 
 
+;Subgoal *1/1.2
+;(IMPLIES (NOT (CONSP X)) (NOT X))
+(not (consp t))
+(not t)
+(compress-s t)
+(defthm compress-equiv
+  (equal (compress x) (compress-s x)))
 
 
 ;;; Exercise 11.18
