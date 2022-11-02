@@ -4,10 +4,36 @@
         ((equal a (car b)) t)
         (t (in a (cdr b)))))
 
+; [JM] My compress define
 (defun compress (x)
   (cond ((endp x) nil)
-        ((in (car x) (cdr x)) (compress (cdr x)))
+        ((equal (car x) (cadr x)) (compress (cdr x)))
         (t (cons (car x) (compress (cdr x))))))
+
+; [JM] Define from solution
+(defun compress-s (x)
+  (cond ((or (endp x) (endp (cdr x))) x)
+        ((equal (car x) (cadr x)) (compress (cdr x)))
+        (t (cons (car x) (compress (cdr x))))))
+
+; Try to fine the difference
+;(defthm compress-equiv
+;  (equal (compress x) (compress-s x)))
+
+; Test compress
+(compress '(x x x y z y x y y))
+; It should be '(x y z y x y)
+(compress '(x x x y z z z y x y y))
+; It should be '(x y z y x y)
+(compress '())
+(compress '(x))
+(compress '(x x))
+(compress '(nil x x))
+(compress-s '(nil x x))
+(cadr '())#|ACL2s-ToDo-Line|#
+
+
+
 
 ;;; Exercise 11.18
 (defthm compress-compress
@@ -17,47 +43,30 @@
 ;;; Exercise 11.19
 
 ; Proof helper
+; [JM] Proof of compress-append, from prover 
 ;Subgoal *1/2.3'
 ;(IMPLIES (AND (CONSP X)
 ;              (EQUAL (COMPRESS (APPEND (COMPRESS (CDR X)) Y))
 ;                     (COMPRESS (APPEND (CDR X) Y)))
-;              (IN (CAR X) (CDR X)))
-;         (IN (CAR X) (APPEND (CDR X) Y)))
-;
-;[JM] It seems it needs in-apppend
-(defthm in-append
-  (implies (in a x)
-           (in a (append x y))))
+;              (EQUAL (CAR X) (CADR X)))
+;         (EQUAL (CAR X)
+;                (CAR (APPEND (CDR X) Y))))
+; 
+; [JM] Try car-append
+;(defthm car-append
+;  (implies (equal a (car x))
+;           (equal a (car (append x y)))))
+(defthm car-append
+  (equal (car (append x y))
+         (if (consp x)
+             (car x)
+           (car y))))
 
-;Subgoal *1/2.2''
-;(IMPLIES (AND (CONSP X)
-;              (EQUAL (COMPRESS (APPEND (COMPRESS (CDR X)) Y))
-;                     (COMPRESS (APPEND (CDR X) Y)))
-;              (NOT (IN (CAR X) (CDR X)))
-;              (NOT (IN (CAR X) (APPEND (CDR X) Y))))
-;         (NOT (IN (CAR X)
-;                  (APPEND (COMPRESS (CDR X)) Y))))
-;
-;[JM] It seems it needs not-in-append-compress
-(defthm not-in-append-compress
-  (implies (and (not (in a x))
-                (not (in a (append x y))))
-           (not (in a (append (compress x) y)))))
-
-;Subgoal *1/2.1''
-;(IMPLIES (AND (CONSP X)
-;              (EQUAL (COMPRESS (APPEND (COMPRESS (CDR X)) Y))
-;                     (COMPRESS (APPEND (CDR X) Y)))
-;              (NOT (IN (CAR X) (CDR X)))
-;              (IN (CAR X) (APPEND (CDR X) Y)))
-;         (IN (CAR X)
-;             (APPEND (COMPRESS (CDR X)) Y)))
-;
-;[JM] It seems it need in-append-compress
-(defthm in-compress
-  (implies (in a (append x y))
-           (in a (append (compress x) y))))
-
+(and (not (car '(x)))
+     (consp '(x)))
+(defthm consp-compress
+  (equal (consp (compress x))
+         (consp x)))                
 ; Proof target
 (defthm compress-append
   (equal (compress (append (compress x) y))
@@ -103,11 +112,104 @@
 ; Proof target
 (defthm compress-ordered
   (implies (orderedp x)
-           (no-dupls-p (compress x))))#|ACL2s-ToDo-Line|#
+           (no-dupls-p (compress x))))
+
+
+;;; Exercise 11.21
+(defun same-compress (x y)
+  (equal (compress x) (compress y)))
+
+;;; Exercise 11.22
+:trans1 (defequiv same-compress)
+; (DEFTHM SAME-COMPRESS-IS-AN-EQUIVALENCE
+;         (AND (BOOLEANP (SAME-COMPRESS X Y))
+;              (SAME-COMPRESS X X)
+;              (IMPLIES (SAME-COMPRESS X Y)
+;                       (SAME-COMPRESS Y X))
+;              (IMPLIES (AND (SAME-COMPRESS X Y)
+;                            (SAME-COMPRESS Y Z))
+;                       (SAME-COMPRESS X Z)))
+;         :RULE-CLASSES (:EQUIVALENCE))
+(defequiv same-compress)
+
+;;; Exercise 11.23
+:trans1 (defcong same-compress same-compress (append x y) 2)
+; (DEFTHM SAME-COMPRESS-IMPLIES-SAME-COMPRESS-APPEND-2
+;         (IMPLIES (SAME-COMPRESS Y Y-EQUIV)
+;                  (SAME-COMPRESS (APPEND X Y)
+;                                 (APPEND X Y-EQUIV)))
+;         :RULE-CLASSES (:CONGRUENCE))
+
+; Proof helper
+; [JM] Try to proof (defcong same-compress same-compress (append x y) 2),
+;      from prover
+;Subgoal *1/2.2'
+;(IMPLIES (AND (CONSP X)
+;              (EQUAL (COMPRESS (APPEND (CDR X) Y))
+;                     (COMPRESS (APPEND (CDR X) Y-EQUIV)))
+;              (EQUAL (COMPRESS Y) (COMPRESS Y-EQUIV))
+;              (IN (CAR X) (APPEND (CDR X) Y)))
+;         (IN (CAR X) (APPEND (CDR X) Y-EQUIV)))
+;
+; [JM] It seems the prover need in-equal-compress-append, from prover
+;Subgoal *1/2.1
+;(IMPLIES (AND (CONSP Y)
+;              (NOT (IN (CAR Y) (CDR Y)))
+;              (EQUAL (CONS (CAR Y) (COMPRESS (CDR Y)))
+;                     (COMPRESS Y-EQUIV)))
+;         (IN (CAR Y) Y-EQUIV))
+;
+; [JM] Add equal-cons-compress-in
+(defthm equal-cons-in
+  (implies (equal (cons a (compress x)) (compress y))
+           (in a y)))
+
+; [JM] The proof of in-equal-compress-append move on to
+;Subgoal *1/1''
+;(IMPLIES (AND (NOT (CONSP X))
+;              (EQUAL (COMPRESS Y) (COMPRESS Y-EQUIV))
+;              (IN A Y))
+;         (IN A Y-EQUIV))
+;
+; [JM] Try equal-compress-in, from prover
+;Subgoal *1/3.1'
+;(IMPLIES (AND (CONSP Y)
+;              (NOT (EQUAL A (CAR Y)))
+;              (NOT (EQUAL (COMPRESS (CDR Y))
+;                          (COMPRESS Y-EQUIV)))
+;              (NOT (IN (CAR Y) (CDR Y)))
+;              (EQUAL (CONS (CAR Y) (COMPRESS (CDR Y)))
+;                     (COMPRESS Y-EQUIV))
+;              (IN A (CDR Y)))
+;         (IN A Y-EQUIV))
+;
+;
+
+(defthm equal-compress-in
+  (implies (and (equal (compress y) (compress y-equiv))
+                (in a y))
+           (in a y-equiv)))
+                
+(defthm in-equal-compress-append
+  (implies (and (equal (compress y) (compress y-equiv))
+                (in a (append x y)))
+           (in a (append x y-equiv))))
 
 
 
+                
+;Subgoal *1/2.1'
+;(IMPLIES (AND (CONSP X)
+;              (EQUAL (COMPRESS (APPEND (CDR X) Y))
+;                     (COMPRESS (APPEND (CDR X) Y-EQUIV)))
+;              (EQUAL (COMPRESS Y) (COMPRESS Y-EQUIV))
+;              (NOT (IN (CAR X) (APPEND (CDR X) Y))))
+;         (NOT (IN (CAR X) (APPEND (CDR X) Y-EQUIV))))
+;
+; Proof target
+(defcong same-compress same-compress (append x y) 2)
 
-
-
-
+; Backup
+(defthm in-compress
+  (equal (in a (compress x))
+         (in a x)))
