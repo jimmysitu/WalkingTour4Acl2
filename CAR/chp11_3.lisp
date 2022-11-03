@@ -40,29 +40,51 @@
 (endp '(nil)) ; return NIL
 (equal (car '(nil)) (cadr '(nil))) ; returns T, here is the problem
 
-; [JM] Try a new version
-(defun compress (x)
+; [JM] Try a new version compress-jm2
+(defun compress-jm2 (x)
   (cond ((endp x) nil)
         ((endp (cdr x)) x)
-        ((equal (car x) (cadr x)) (compress (cdr x)))
-        (t (cons (car x) (compress (cdr x))))))
+        ((equal (car x) (cadr x)) (compress-jm2 (cdr x)))
+        (t (cons (car x) (compress-jm2 (cdr x))))))
 ;Test compress
-(compress '(nil))
-(compress '())
+(compress-jm2 '(nil))
+(compress-jm2 '())
 (compress-s '(nil))
-(compress-s'())#|ACL2s-ToDo-Line|#
-
+(compress-s'())
 
 ;Subgoal *1/1.2
 ;(IMPLIES (NOT (CONSP X)) (NOT X))
 (not (consp t))
 (not t)
-(compress-s t)
-(defthm compress-equiv
-  (equal (compress x) (compress-s x)))
+;(defthm compress-equiv
+;  (equal (compress-jm2 x) (compress-s x)))
+
+(defun compress (x)
+  (cond ((endp x) nil)
+        ((endp (cdr x)) x)
+        ((equal (car x) (cadr x)) (compress (cdr x)))
+        (t (cons (car x) (compress (cdr x))))))
 
 
 ;;; Exercise 11.18
+; Proof helper of compress-compress
+;Subgoal *1/4'''
+;(IMPLIES (AND (CONSP X)
+;              (CONSP (CDR X))
+;              (NOT (EQUAL (CAR X) (CADR X)))
+;              (EQUAL (COMPRESS (COMPRESS (CDR X)))
+;                     (COMPRESS (CDR X)))
+;              (CONSP (COMPRESS (CDR X))))
+;         (NOT (EQUAL (CAR X)
+;                     (CAR (COMPRESS (CDR X))))))
+; [JM] try not-equal-car-compress
+(defthm not-equal-car-compress
+  (implies (and (consp x)
+                (not (equal a (car x))))
+           (not (equal a
+                       (car (compress x))))))
+
+; Proof target
 (defthm compress-compress
   (equal (compress (compress x)) (compress x)))
 
@@ -114,30 +136,54 @@
 
 ; [JM] mem is similar with in, try to replace it
 (defun no-dupls-p (lst)
-  (cond ((atom lst) t)
+  (cond ((endp lst) t)
         ((in (car lst) (cdr lst)) nil)
         (t (no-dupls-p (cdr lst)))))
 ; Test no-dupls-p
 (no-dupls-p '(a b c a d))
-(no-dupls-p '(a b c d))
+(no-dupls-p '(a b c d))#|ACL2s-ToDo-Line|#
+
             
 ; Proof helper for compress-orderedp
-;Subgoal *1/5.1
+;Subgoal *1/6''
 ;(IMPLIES (AND (CONSP X)
-;              (NOT (IN (CAR X) (CDR X)))
+;              (CONSP (CDR X))
+;              (NOT (EQUAL (CAR X) (CADR X)))
 ;              (NO-DUPLS-P (COMPRESS (CDR X)))
 ;              (<= (CAR X) (CADR X))
 ;              (ORDEREDP (CDR X)))
 ;         (NOT (IN (CAR X) (COMPRESS (CDR X)))))
 ;
-; [JM] It seems it need not-in-compress
-(defthm not-in-compress
-  (implies (not (in a x))
-           (not (in a (compress x)))))
+; [JM] Try not-equal-car-not-in-compress, from prover
+;Subgoal *1/4'''
+;(IMPLIES (AND (CONSP X)
+;              (CONSP (CDR X))
+;              (NOT (EQUAL (CAR X) (CADR X)))
+;              (<= (CAR X) (CADR X))
+;              (ORDEREDP (CDR X)))
+;         (NOT (IN (CADR X) (COMPRESS (CDR X)))))
+;
+; [JM] (NOT (IN (CADR X) (COMPRESS (CDR X))))) can never be true
+;      Maybe not-equal-car-not-in-compress is a contradiction
+;(defthm not-equal-car-not-in-compress
+;  (implies (and (consp x)
+;                (not (equal a (car x)))
+;                (orderedp x))
+;           (not (in a (compress x)))))
 
+; [JM] Try car-in-compress
+;(defthm car-in-compress
+;  (implies (and (consp x))
+;           (in (car x) (compress x))))
+(defthm in-compress
+  (equal (in a (compress x))
+         (in a x)))
+
+:brr t
+(cw-gstack :frames 30)
 
 ; Proof target
-(defthm compress-ordered
+(defthm ordered-compress-is-no-dupls-p
   (implies (orderedp x)
            (no-dupls-p (compress x))))
 
