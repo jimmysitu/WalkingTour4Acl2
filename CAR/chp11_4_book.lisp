@@ -111,24 +111,36 @@
                   (+ (/ (+ n (* n n)))
                      (* n (/ (+ n (* n n)))))))
   :hints (("goal" :in-theory (disable distributivity)
-                  :use ((:instance combine-fraction-thm)
-                        (:instance common-denominator-thm
+                  :use ((:instance common-denominator-thm
                          (x 1)
                          (y (+ n (* n n)))
                          (z n)))
                   )))
-                        
-:brr t
-(cw-gstack :frames 30)#|ACL2s-ToDo-Line|#
+
+; [JM] Try to rewrite hypothesis in subgoal *1/3', sum31-thm-helper1
+(defthm simplify-add
+  (equal (+ a (* (- n 1) a))
+         (* n a)))
+            
+(defthm sum31-thm-helper1
+  (implies (and (not (zp n))
+                (equal (- n 1)
+                       (+ (sum31 (- n 1))
+                          (* (- n 1) (sum31 (- n 1))))))
+           (equal (- n 1)
+                  (* n (sum31 (- n 1))))))#|ACL2s-ToDo-Line|#
 
 
+(cw-gstack :frames 30)
 ; [JM] Try to disable distributivity to break rewrite loop
 ; Proof target
 (defthm sum31-thm
   (implies (natp n)
            (equal (sum31 n)
                   (/ n (+ n 1))))
-  :hints (("goal" :in-theory (disable distributivity))))
+  :hints (("goal" :in-theory (disable distributivity))
+          ("subgoal *1/3''" :in-theory (enable distributivity))))
+
 
 
 
