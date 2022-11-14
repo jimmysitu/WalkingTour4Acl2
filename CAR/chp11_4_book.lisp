@@ -74,8 +74,7 @@
          (/ n (+ n 1))))
 (let ((n 100))
   (equal (sum31 n)
-         (/ n (+ n 1))))#|ACL2s-ToDo-Line|#
-
+         (/ n (+ n 1))))
 
 ; Proof helper
 ;Subgoal *1/3'
@@ -88,12 +87,48 @@
 ;                   (* N (SUM31 (+ -1 N)))
 ;                   (/ (+ N (* N N)))
 ;                   (* N (/ (+ N (* N N)))))))
+;
+; [JM] Just try some simplify rewrite
+(defthm common-denominator-thm
+  (implies (not (zp y))
+           (equal (+ (* x (/ y))
+                     (* z (/ y)))
+                  (* (+ x z) (/ y)))))
 
+(defthm reduct-fraction-thm
+  (implies (not (zp n))
+           (equal (/ 1 n)
+                  (* n (/ (* n n))))))
+
+(defthm combine-fraction-thm
+  (equal (+ n (* n n))
+         (* n (+ n 1))))
+
+; [JM] Try to add some hints
+(defthm sum31-thm-helper0
+  (implies (not (zp n))
+           (equal (/ 1 n)
+                  (+ (/ (+ n (* n n)))
+                     (* n (/ (+ n (* n n)))))))
+  :hints (("goal" :in-theory (disable distributivity)
+                  :use ((:instance combine-fraction-thm)
+                        (:instance common-denominator-thm
+                         (x 1)
+                         (y (+ n (* n n)))
+                         (z n)))
+                  )))
+                        
+:brr t
+(cw-gstack :frames 30)#|ACL2s-ToDo-Line|#
+
+
+; [JM] Try to disable distributivity to break rewrite loop
 ; Proof target
 (defthm sum31-thm
   (implies (natp n)
            (equal (sum31 n)
-                  (/ n (+ n 1)))))
+                  (/ n (+ n 1))))
+  :hints (("goal" :in-theory (disable distributivity))))
 
 
 
