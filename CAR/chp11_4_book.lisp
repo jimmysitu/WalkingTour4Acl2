@@ -107,9 +107,9 @@
 ; [JM] Try to add some hints
 (defthm sum31-thm-helper0
   (implies (not (zp n))
-           (equal (/ 1 n)
-                  (+ (/ (+ n (* n n)))
-                     (* n (/ (+ n (* n n)))))))
+           (equal (+ (/ (+ n (* n n)))
+                     (* n (/ (+ n (* n n)))))
+                  (/ 1 n)))
   :hints (("goal" :in-theory (disable distributivity)
                   :use ((:instance common-denominator-thm
                          (x 1)
@@ -127,23 +127,30 @@
                 (equal (- n 1)
                        (+ (sum31 (- n 1))
                           (* (- n 1) (sum31 (- n 1))))))
-           (equal (- n 1)
-                  (* n (sum31 (- n 1))))))#|ACL2s-ToDo-Line|#
+           (equal (* n (sum31 (- n 1)))
+                  (- n 1))))
+
+(defthm sum31-thm-helper2
+  (implies (and (not (zp n))
+                (equal (- n 1)
+                       (+ (sum31 (- n 1))
+                          (* (- n 1) (sum31 (- n 1))))))
+           (equal (sum31 (- n 1))
+                  (/ (- n 1) n)))
+  :hints (("goal" :in-theory (disable distributivity))))
 
 
-(cw-gstack :frames 30)
 ; [JM] Try to disable distributivity to break rewrite loop
 ; Proof target
 (defthm sum31-thm
   (implies (natp n)
            (equal (sum31 n)
                   (/ n (+ n 1))))
-  :hints (("goal" :in-theory (disable distributivity))
-          ("subgoal *1/3''" :in-theory (enable distributivity))))
+  :hints (("goal" :in-theory (disable common-denominator-thm
+                                      reduct-fraction-thm
+                                      combine-fraction-thm))))#|ACL2s-ToDo-Line|#
 
-
-
-
+                                    
 ;;; Exercise 11.32
 
 
