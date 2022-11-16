@@ -90,10 +90,21 @@ Solutions to exercises are [here](https://github.com/acl2/acl2/tree/master/books
 ### Tips
 
 * When the proof of theorem stop at a subgoal, try to understand what is this subgoal want to assert.
+
   * One common case is that subgoal needs too much propositions which it is not necessary. Try to proof a theorem stronger theorem with less proposition
   * Some cases, one proposition can be implied by other propositions
   *  Other common case is that subgoal is a false proposition, which can never be proof. In such case, there are usually contradiction in propositions. Try to write out a theorem to assert this contradiction
-* When the proof of theorem cannot be stopped in a while, usually more than several minutes, the proof maybe come into a dead loop.
+
+* When the proof of theorem cannot be stopped in a while, usually more than several minutes, the proof maybe come into a dead loop, try this command to check the root cause
+
+  ```lisp
+  :brr t
+  (cw-gstack :frames 30)
+  ```
+
+* Some helper of aux theory may let the goal fall into a rewrite dead loop. Try to disable some helper s,  so the proof tree can go back to the same subgoal
+
+   
 
 ## Computer-Aide Reasoning: ACL2 Case Studies (ACS)
 

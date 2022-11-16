@@ -148,12 +148,54 @@
                   (/ n (+ n 1))))
   :hints (("goal" :in-theory (disable common-denominator-thm
                                       reduct-fraction-thm
-                                      combine-fraction-thm))))#|ACL2s-ToDo-Line|#
-
+                                      combine-fraction-thm))))
                                     
 ;;; Exercise 11.32
+(defun sum32 (n)
+  (cond ((zp n) 0)
+         (t (+ (- (* 4 n) 1)
+               (sum32 (- n 1))))))
+
+;Test theory
+(let ((n 3))
+  (equal (sum32 n)
+         (* n (+ (* 2 n) 1))))
+
+(let ((n 111))
+  (equal (sum32 n)
+         (* n (+ (* 2 n) 1))))
+
+; Proof target
+(defthm sum32-thm
+  (implies (not (zp n))
+           (equal (sum32 n)
+                  (* n (+ (* 2 n) 1)))))
 
 
 ;;; Exercise 11.33
+(defun sum33 (n)
+  (cond ((zp n) 0)
+        (t (+ (* n n n)
+              (sum33 (- n 1))))))
+
+; Test theory
+(let ((n 11))
+  (equal (* (sum26 n) (sum26 n))
+         (sum33 n)))
+
+:brr t
+(cw-gstack :frames 30)
+
+; Proof target
+(defthm sum33-thm
+  (implies (not (zp n))
+           (equal (* (sum26 n) (sum26 n))
+                  (sum33 n)))
+  :hints (("goal" :in-theory (disable combine-fraction-thm))))#|ACL2s-ToDo-Line|#
+
+
+                
+
+
 
 
