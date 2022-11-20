@@ -135,11 +135,178 @@
 ; Test peval
 (let ((x 'c))
   (cdr (assoc x '((c . t) (b . nil)))))
-(peval '(if (if t c b) c b) '((c . t) (b . nil)))#|ACL2s-ToDo-Line|#
+(peval '(if (if t c b) c b) '((c . t) (b . nil)))
 
+      
+;;; Exercise 11.39
 
-      
-      
-      
+; [JM] Some test about aeval
+(let ((x 'd))
+  (aeval x '((c . t) (b . nil))))
+; Return NIL
+
+; [JM] assume x is normalized
+;(defun tautp (x a)
+;  (cond ((ifp x) (and (tautp (tb x) a)
+;                      (tautp (fb x) a)))
+;        (t (aeval x a))))
+;
+; [JM] This version tautp is too strong
+;      An appropriate tautp needs and only needs care about (tb x) when (test x) is t
+;      and cares about (fb x) when (test x) is nil
+
+(defun assumep (x a)
+  (or (booleanp x)
+      (assoc x a)))
+; Test assumep
+(let ((x 'd))
+  (assumep x '((d . t) (c . nil))))
+(let ((x 'a))
+  (assumep x '((d . t) (c . nil))))
+
+(defun assume-t (x a)
+  (cons (cons x t)
+        a))
+
+(defun assume-nil (x a)
+  (cons (cons x nil)
+        a))
     
-  
+(defun tautp (x a)
+  (cond ((ifp x) (if (assumep (test x) a)
+                   (if (aeval (test x) a)
+                     (tautp (tb x) a)
+                     (tautp (fb x) a))
+                   ; (test x) is not boolean or assumed, assume both case
+                   (and (tautp (tb x)
+                               (assume-t (test x) a))
+                        (tautp (fb x)
+                               (assume-nil (test x) a)))))
+        (t (aeval x a))))
+
+
+(defun tautp-chk (x)
+  (tautp (if-n x) nil))
+; Test tautp-chk
+(tautp-chk '(if nil t t))
+(tautp-chk '(if nil nil t))
+(tautp-chk '(if nil (if nil t t) t))
+(tautp-chk '(if nil (if nil t nil) t))
+(tautp-chk '(if (if nil t nil) nil t))
+    
+;;; Exercise 11.40
+; Proof helper
+;Subgoal *1/5.2
+;(IMPLIES (AND (CONSP X)
+;              (EQUAL (CAR X) 'IF)
+;              (NOT (CONSP (CADR X)))
+;              (NOT (TAUTP (IF-N (CADDR X)) NIL))
+;              (PEVAL (CADDDR X) A)
+;              (NOT (BOOLEANP (CADR X)))
+;              (TAUTP (IF-N (CADDR X))
+;                     (LIST (CONS (CADR X) T)))
+;              (TAUTP (IF-N (CADDDR X))
+;                     (LIST (LIST (CADR X))))
+;              (CDR (ASSOC-EQUAL (CADR X) A)))
+;         (PEVAL (CADDR X) A))
+;
+;Subgoal *1/5.1
+;(IMPLIES (AND (CONSP X)
+;              (EQUAL (CAR X) 'IF)
+;              (NOT (EQUAL (CAR (CADR X)) 'IF))
+;              (NOT (TAUTP (IF-N (CADDR X)) NIL))
+;              (PEVAL (CADDDR X) A)
+;              (NOT (BOOLEANP (CADR X)))
+;              (TAUTP (IF-N (CADDR X))
+;                     (LIST (CONS (CADR X) T)))
+;              (TAUTP (IF-N (CADDDR X))
+;                     (LIST (LIST (CADR X))))
+;              (CDR (ASSOC-EQUAL (CADR X) A)))
+;         (PEVAL (CADDR X) A))
+;
+;Subgoal *1/4.3
+;(IMPLIES (AND (CONSP X)
+;              (EQUAL (CAR X) 'IF)
+;              (NOT (CONSP (CADR X)))
+;              (PEVAL (CADDR X) A)
+;              (NOT (TAUTP (IF-N (CADDDR X)) NIL))
+;              (NOT (BOOLEANP (CADR X)))
+;              (TAUTP (IF-N (CADDR X))
+;                     (LIST (CONS (CADR X) T)))
+;              (TAUTP (IF-N (CADDDR X))
+;                     (LIST (LIST (CADR X))))
+;              (NOT (CDR (ASSOC-EQUAL (CADR X) A))))
+;         (PEVAL (CADDDR X) A))
+;
+; [JM] It seems these three subgoal can never be proofed directly,
+;      since they are the same as the goal.
+;      Check more subgoal
+:set-checkpoint-summary-limit nil
+; [JM] Almost the same subgoal, try to read more proof log
+:set-gag-mode t
+#|ACL2s-ToDo-Line|#
+; [JM] No idea where goes wrong, try some helper from solution
+; ==== From solution ====
+; Here we determine if x is in if-normal form.
+
+(defun normp (x)
+  (if (ifp x)
+      (and (not (ifp (test x)))
+           (normp (tb x))
+           (normp (fb x)))
+    t))
+
+; These lemmas were generated with The Method.  Append was introduced
+; into the problem in tautp-implies-peval, below, because we must
+; generalize from the empty initial assignment to an arbitrary one.
+
+(defthm assoc-equal-append
+  (implies (alistp a)
+           (equal (assoc-equal v (append a b))
+                  (if (assoc-equal v a)
+                      (assoc-equal v a)
+                    (assoc-equal v b)))))
+
+; If a variable is already assigned value val, a new pair binding it to
+; val can be ignored (in the sense that no peval is changed).
+
+(defthm peval-ignores-redundant-assignments
+  (implies (iff (cdr (assoc-equal var alist)) val)
+           (iff (peval x (cons (cons var val) alist))
+                (peval x alist))))
+
+; So here is the main soundness result about tautp: if the expression is in
+; if-normal form and is a tautology under some assignment, then its value is
+; true under any extension of that assignment.  In our intended use, b will
+; be nil, and so the (append b a) expression will just be a.  Thus, this
+; lemma is not going to be used as a rewrite rule -- (append nil a) will not
+; occur in the target.  Instead we will :use it explicitly.  So we make it of
+; :rule-classes nil.
+
+(defthm tautp-implies-peval
+  (implies (and (alistp b)
+                (normp x)
+                (tautp x b))
+           (peval x (append b a)))
+  :rule-classes nil)
+
+; Now we deal with the normalization phase.  We prove that if-n normalizes
+; while preserving the value under all assignments.
+
+(defthm normp-if-n
+  (normp (if-n x)))
+
+(defthm peval-if-n
+  (equal (peval (if-n x) a)
+         (peval x a)))
+
+; We can now put these together.
+; ==== End of solution ====
+
+; Proof target
+(defthm tautp-sound
+  (implies (tautp-chk x)
+           (peval x a))
+  :hints (("Goal" :use (:instance tautp-implies-peval
+                                  (x (if-n x))
+                                  (b nil)))))
