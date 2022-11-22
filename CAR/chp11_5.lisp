@@ -244,7 +244,6 @@
 :set-checkpoint-summary-limit nil
 ; [JM] Almost the same subgoal, try to read more proof log
 :set-gag-mode t
-#|ACL2s-ToDo-Line|#
 ; [JM] No idea where goes wrong, try some helper from solution
 ; ==== From solution ====
 ; Here we determine if x is in if-normal form.
@@ -309,4 +308,14 @@
            (peval x a))
   :hints (("Goal" :use (:instance tautp-implies-peval
                                   (x (if-n x))
-                                  (b nil)))))
+                                  (b nil)))))#|ACL2s-ToDo-Line|#
+
+
+;;; Exercise 11.41
+
+; [JM] Too difficulty for me, come back later
+; Proof target
+(defthm tautp-complete
+  (implies (not (tautp-chk x))
+           (not (peval x a))))
+ 
