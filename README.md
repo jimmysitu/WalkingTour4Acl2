@@ -1,4 +1,7 @@
+
+
 # Jimmy's Playground of  Learning ACL2
+
 This repo is used as Jimmy's playground of learning **ACL2**. It covers
 
 * [A walking tour of ACL2](https://www.cs.utexas.edu/users/moore/acl2/v8-5/combined-manual/index.html?topic=ACL2____A_02Walking_02Tour_02of_02ACL2),  about 1h
@@ -69,11 +72,85 @@ Vim user may like to install Vrapper plugin for Eclipse.
 
 ### Emacs Approach
 
-Install Emacs and acl2 directly. For ubuntu users, it may need 2GB+ hard disk space
+#### Out of Box Install
+
+Install Emacs and acl2 directly. For Ubuntu users, it may need 2GB+ hard disk space. This ACL2 is compiled with GCL, which is good enough for simple demo.
 
 ```bash
 sudo apt install acl2
 ```
+
+#### Install for Experts
+
+Since quicklisp books have not yet been made to work with GCL, most ACL2 users use CCL or SBCL.
+
+##### Install Clozure CL (CCL)
+
+Do a fresh clone for the first, switch to latest release.
+
+```bash
+sudo git clone https://github.com/Clozure/ccl.git /opt/ccl
+sudo git checkout v1.12.1
+```
+
+Go to check  [here](https://github.com/Clozure/ccl/releases/) to check lastest release, download and unpacking the bootstrapping binaries, you can rebuild CCL by evaluating `(rebuild-ccl :full t)` as usual.
+
+```bash
+curl -L -O https://github.com/Clozure/ccl/releases/download/v1.12.1/linuxx86.tar.gz
+tar -zxf linuxx86.tar.gz
+```
+
+Rebuild and quit, twice
+
+```
+echo '(rebuild-ccl :full t)' | sudo ./lx86cl64
+echo '(rebuild-ccl :full t)' | sudo ./lx86cl64
+```
+
+Copy the executable script to $PATH, e.g. /usr/local/bin
+
+```bash
+sudo script/ccl64 /usr/local/bin/ccl
+```
+
+Change the $CCL_DEFAULT_DIRECTORY to /opt/ccl
+
+```bash
+if [ -z "$CCL_DEFAULT_DIRECTORY" ]; then
+  CCL_DEFAULT_DIRECTORY=/opt/ccl
+fi
+```
+
+##### Install ACL2
+
+Compile ACL2 with CCL
+
+```bash
+sudo git clone https://github.com/acl2/acl2.git
+sudo git checkout 8.5
+
+```
+
+Rebuild CCL with new memory settings, which Centaur recommands,
+
+```bash
+cd /opt/ccl
+sudo ./lx86cl64 -n < /opt/acl2/books/centaur/ccl-config.lsp
+cd /opt/acl2
+sudo make LISP=ccl
+```
+
+
+
+
+
+Certify some books, for example with
+
+```bash
+make basic
+```
+
+
 
 ## Walking Tour
 
