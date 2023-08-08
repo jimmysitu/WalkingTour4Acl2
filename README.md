@@ -140,15 +140,39 @@ cd /opt/acl2
 sudo make LISP=ccl
 ```
 
-
-
-
-
 Certify some books, for example with
 
 ```bash
 make basic
 ```
+
+Certify books from Centaur
+
+```bash
+sudo make USE_QUICKLISP=1 ACL2=/opt/acl2/saved_acl2 -j2 centaur manual
+```
+
+##### Emacs for Vimmers
+
+Install some Emacs configuration for Vim users
+
+```bash
+git clone https://github.com/ideasman42/emacs-for-vimmers.git
+cp -R emacs-for-vimmers/.emacs.d ~/
+emacs
+```
+
+Add Emacs support for ACL2 in `~/.emacs/custom.el`
+
+```lisp
+(load "/opt/acl2/books/emacs/emacs-acl2.el")
+```
+
+
+
+
+
+
 
 
 
