@@ -149,6 +149,8 @@ make basic
 Certify books from Centaur
 
 ```bash
+# May need some extra tools, such as z3
+sudo pip3 install z3
 sudo make USE_QUICKLISP=1 ACL2=/opt/acl2/saved_acl2 -j2 centaur manual
 ```
 
